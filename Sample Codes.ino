@@ -62,6 +62,7 @@ ISR(PCINT2_vect) {
 
 }
 
+
 //Testing IR
 
 #define IR1Pin  A0   // A0 input pin for IR sensor signal
@@ -78,6 +79,25 @@ void loop() {
     Serial.print(IR1_Val);       // Printing IR sensor 1 signal value
     Serial.print("\n");            // moving to new line
     delay(500);                      // Waiting for a while.
+    
+    
+    
+  //Test the Relay circuit and motor direction control
+
+#define motionPin 9
+
+void setup() 
+{
+  pinMode(motionPin, OUTPUT); //digital output for motor direction control
+}
+
+void loop() {
+// test tamiya car
+  digitalWrite(motionPin, LOW); // move toward one direction for 2s
+  delay(2000);
+  digitalWrite(motionPin, HIGH); //move toward opposite direction for 2s
+  delay(2000);
+}
 
 
    
