@@ -82,8 +82,13 @@ void loop() {
     
     
     
-  //Test the Relay circuit and motor direction control
-
+  
+    
+    
+    
+    
+//Test the Relay circuit and motor direction control    
+    
 #define motionPin 9
 
 void setup() 
@@ -92,7 +97,7 @@ void setup()
 }
 
 void loop() {
-// test tamiya car
+
   digitalWrite(motionPin, LOW); // move toward one direction for 2s
   delay(2000);
   digitalWrite(motionPin, HIGH); //move toward opposite direction for 2s
