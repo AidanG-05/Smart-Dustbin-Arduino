@@ -1,5 +1,4 @@
 #include <LiquidCrystal_I2C.h>
-#include "../../../../Documents/Arduino/libraries/LiquidCrystal_I2C-1.1.2/LiquidCrystal_I2C.h"
 #define Hit_aPin 4;
 #define Hit_bPin 2;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
