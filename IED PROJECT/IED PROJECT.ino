@@ -29,10 +29,6 @@ void setup() {
 // the loop function runs over and over again until power down or reset
 void loop()
 {
-    lcd.setCursor(0, 0);
-    lcd.print("Free to fill");
-    lcd.setCursor(0, 1);
-    delay(1000);
 
     ultrasound1();
 }
@@ -72,5 +68,16 @@ void ultrasound1() {
     Serial.println(" cm");
     delay(500);
 
-    
+    if (Distance < 40) {
+        lcd.setCursor(0, 0);
+        lcd.print("Bin is full");
+        lcd.setCursor(0, 1);
+        delay(1000);
+    }
+    else {
+        lcd.setCursor(0, 0);
+        lcd.print("Free to fill");
+        lcd.setCursor(0, 1);
+        delay(1000);
+    }
 }
