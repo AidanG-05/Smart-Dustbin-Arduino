@@ -1,6 +1,9 @@
 #include <LiquidCrystal_I2C.h>
+
 #define TrigPin1 11   // U/S1 Trig connected to pin 11
 #define EchoPin1 10   // U/S1 Echo connected to pin 10
+
+
 #define Hit_aPin 4;
 #define Hit_bPin 2;
 
@@ -44,6 +47,7 @@ ISR(PCINT2_vect) {
 }
 
 
+
 void ultrasound1() {
     long pulseDuration; //variable needed by the ultrasound sensor code
     int Distance;       // Ultrasound distance in cm
@@ -81,3 +85,4 @@ void ultrasound1() {
         delay(1000);
     }
 }
+
