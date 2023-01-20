@@ -2,8 +2,7 @@
 
 #define TrigPin1 11   // U/S1 Trig connected to pin 11
 #define EchoPin1 10   // U/S1 Echo connected to pin 10
-
-
+#define LED_RED 6;
 #define Hit_aPin 4;
 #define Hit_bPin 2;
 
@@ -19,7 +18,8 @@ void setup() {
     pinMode(2, INPUT_PULLUP);
     pinMode(4, INPUT_PULLUP);
     pinMode(TrigPin1, OUTPUT);  //Arduino's output, ranger's input
-    pinMode(EchoPin1, INPUT);   //Arduino's input, ranger's output
+    pinMode(EchoPin1, INPUT);  //Arduino's input, ranger's output
+    pinMode(6, OUTPUT);
 
     PCICR |= B00000100; // Enable interrupts on PD port
     PCMSK2 |= B00010100; // Trigger interrupts on pins D2 and D4
@@ -35,18 +35,6 @@ void loop()
 
     ultrasound1();
 }
-
-ISR(PCINT2_vect) {
-    if (digitalRead(reset) == LOW)
-    {
-        Serial.print("Free to fill");
-    }
-    else if (digitalRead(startStop) == LOW) {
-
-    }
-}
-
-
 
 void ultrasound1() {
     long pulseDuration; //variable needed by the ultrasound sensor code
@@ -76,13 +64,27 @@ void ultrasound1() {
         lcd.setCursor(0, 0);
         lcd.print("Bin is full");
         lcd.setCursor(0, 1);
+        digitalWrite(6, HIGH);
+        delay(2000);
+
         delay(1000);
     }
     else {
         lcd.setCursor(0, 0);
         lcd.print("Free to fill");
         lcd.setCursor(0, 1);
+        digitalWrite(6, LOW);
+        delay(2000);
         delay(1000);
     }
 }
 
+ISR(PCINT2_vect) {
+    if (digitalRead(reset) == LOW)
+    {
+        Serial.print("Free to fill");
+    }
+    else if (digitalRead(startStop) == LOW) {
+
+    }
+}
