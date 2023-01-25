@@ -17,7 +17,7 @@
 #define __AVR_ATmega328P__ 1
 #define __AVR_ATmega328p__ 1
 #define F_CPU 16000000L
-#define ARDUINO 108010
+#define ARDUINO 108019
 #define ARDUINO_AVR_UNO 1
 #define ARDUINO_ARCH_AVR 1
 #define __cplusplus 201103L
