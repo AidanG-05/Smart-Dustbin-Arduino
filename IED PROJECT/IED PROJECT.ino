@@ -32,7 +32,7 @@ void setup()
     espData("AT+CWJAP=\"" + mySSID + "\",\"" + myPWD + "\"", 1000, DEBUG);   //Connect to WiFi network
     pinMode(2, INPUT_PULLUP);
     pinMode(4, INPUT_PULLUP);
-
+    
     //ultrasound
     pinMode(TrigPin1, OUTPUT);  //Arduino's output, ranger's input
     pinMode(EchoPin1, INPUT);  //Arduino's input, ranger's output
@@ -44,20 +44,20 @@ void setup()
     //targetboard
     PCICR |= B00000100; // Enable interrupts on PD port
     PCMSK2 |= B00010100; // Trigger interrupts on pins D2 and D4
-
+    
     //lcd
     lcd.init();
     lcd.begin(16, 2);
     lcd.backlight();
     lcd.clear();
-
+  
     delay(1000);
 
 }
 
 void loop()
 {
-
+  
     ultrasound2();
     ultrasound1();
     wifi();
