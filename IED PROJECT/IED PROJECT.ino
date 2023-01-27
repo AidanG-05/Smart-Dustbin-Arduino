@@ -1,24 +1,39 @@
+#include <SoftwareSerial.h> //Software Serial library
 #include <LiquidCrystal_I2C.h>
-
+SoftwareSerial espSerial(12, 13);   //Pin 12 and 13 act as RX and TX. Connect them to TX and RX of ESP8266      
+#define DEBUG true
+String mySSID = "Galaxy S22 4429";       // WiFi SSID
+String myPWD = "Ninja???"; // WiFi Password
+String myAPI = "I8RPAYBYPSFHVBSP";   // API Key
+String myHOST = "api.thingspeak.com";
+String myPORT = "80";
+String myFIELD = "field1";
+int sendVal;
 #define TrigPin1 11   // U/S1 Trig connected to pin 11
 #define EchoPin1 10   // U/S1 Echo connected to pin 10
 #define TrigPin2 8
 #define EchoPin2 7
-#define LED_RED 6;
-#define Hit_aPin 4;
-#define Hit_bPin 2;
-
-
+#define LED_RED  6
+#define Hit_aPin 4
+#define Hit_bPin 2
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 int Distance2;
 int reset = 0;
 int startStop = 0;
 
-// the setup function runs once when you press reset or power the board
-void setup() {
+void setup()
+{
+    //wifi
     Serial.begin(9600);
+    espSerial.begin(9600);
+
+    espData("AT+RST", 1000, DEBUG);                      //Reset the ESP8266 module
+    espData("AT+CWMODE=1", 1000, DEBUG);                 //Set the ESP mode as station mode
+    espData("AT+CWJAP=\"" + mySSID + "\",\"" + myPWD + "\"", 1000, DEBUG);   //Connect to WiFi network
     pinMode(2, INPUT_PULLUP);
     pinMode(4, INPUT_PULLUP);
+    
+    //ultrasound
     pinMode(TrigPin1, OUTPUT);  //Arduino's output, ranger's input
     pinMode(EchoPin1, INPUT);  //Arduino's input, ranger's output
     pinMode(EchoPin2, INPUT);
@@ -26,19 +41,50 @@ void setup() {
 
     pinMode(6, OUTPUT);
 
+    //targetboard
     PCICR |= B00000100; // Enable interrupts on PD port
     PCMSK2 |= B00010100; // Trigger interrupts on pins D2 and D4
+    
+    //lcd
     lcd.init();
     lcd.begin(16, 2);
     lcd.backlight();
     lcd.clear();
+  
+    delay(1000);
+
 }
 
-// the loop function runs over and over again until power down or reset
 void loop()
 {
+  
     ultrasound2();
     ultrasound1();
+    wifi();
+}
+//wifi related
+String espData(String command, const int timeout, boolean debug)
+{
+    Serial.print("AT Command ==> ");
+    Serial.print(command);
+    Serial.println("     ");
+
+    String response = "";
+    espSerial.println(command);
+    long int time = millis();
+    while ((time + timeout) > millis())
+    {
+        while (espSerial.available())
+        {
+            char c = espSerial.read();
+            response += c;
+        }
+    }
+    if (debug)
+    {
+        Serial.print(response);
+    }
+    return response;
 }
 
 void ultrasound1() {
@@ -83,8 +129,6 @@ void ultrasound1() {
         delay(1000);
     }
 }
-
-
 void ultrasound2() {
     long pulseDuration;
     //variable needed by the ultrasound sensor code
@@ -110,13 +154,18 @@ void ultrasound2() {
     Serial.println(" cm");
     delay(500);
 }
+void wifi()
+{
+    sendVal = random(100); // Send a random number between 1 and 1000
+    String sendData = "GET /update?api_key=" + myAPI + "&" + myFIELD + "=" + String(sendVal);
+    espData("AT+CIPMUX=1", 1000, DEBUG);       //Allow multiple connections
+    espData("AT+CIPSTART=0,\"TCP\",\"" + myHOST + "\"," + myPORT, 1000, DEBUG);
+    espData("AT+CIPSEND=0," + String(sendData.length() + 4), 1000, DEBUG);
+    espSerial.find('>');
+    espSerial.println(sendData);
+    Serial.print("Value to be sent: ");
+    Serial.println(sendVal);
 
-ISR(PCINT2_vect) {
-    if (digitalRead(reset) == LOW)
-    {
-        Serial.print("Free to fill");
-    }
-    else if (digitalRead(startStop) == LOW) {
-
-    }
+    espData("AT+CIPCLOSE=0", 1000, DEBUG);
+    delay(15000);
 }
