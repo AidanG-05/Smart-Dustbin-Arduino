@@ -13,9 +13,14 @@ int sendVal;
 #define EchoPin1 10   // U/S1 Echo connected to pin 10
 #define TrigPin2 8
 #define EchoPin2 7
-#define LED_RED  6
-#define Hit_aPin 4
-#define Hit_bPin 2
+
+#define LED_RED 6;
+#define Hit_aPin 4;
+#define Hit_bPin 2;
+#define motionPin 9
+
+
+
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 int Distance2;
 int reset = 0;
@@ -39,7 +44,8 @@ void setup()
     pinMode(EchoPin2, INPUT);
     pinMode(TrigPin2, OUTPUT);
 
-    pinMode(6, OUTPUT);
+    pinMode(motionPin, OUTPUT); //digital output for motor direction control
+
 
     //targetboard
     PCICR |= B00000100; // Enable interrupts on PD port
@@ -60,6 +66,9 @@ void loop()
   
     ultrasound2();
     ultrasound1();
+
+    motor();
+    
     wifi();
 }
 //wifi related
@@ -85,6 +94,7 @@ String espData(String command, const int timeout, boolean debug)
         Serial.print(response);
     }
     return response;
+
 }
 
 void ultrasound1() {
@@ -154,6 +164,25 @@ void ultrasound2() {
     Serial.println(" cm");
     delay(500);
 }
+
+
+void motor()
+{
+    if (Distance2 < 40)
+    {
+        digitalWrite(motionPin, LOW);
+        delay(3000);
+
+    }
+    else
+    {
+        digitalWrite(motionPin, HIGH);
+        delay(2000);
+
+    }
+
+}
+
 void wifi()
 {
     sendVal = random(100); // Send a random number between 1 and 1000
@@ -168,4 +197,5 @@ void wifi()
 
     espData("AT+CIPCLOSE=0", 1000, DEBUG);
     delay(15000);
+
 }
