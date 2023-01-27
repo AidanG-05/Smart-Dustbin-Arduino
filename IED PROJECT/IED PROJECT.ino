@@ -23,7 +23,7 @@ void setup() {
     pinMode(EchoPin1, INPUT);  //Arduino's input, ranger's output
     pinMode(EchoPin2, INPUT);
     pinMode(TrigPin2, OUTPUT);
-    
+
     pinMode(6, OUTPUT);
 
     PCICR |= B00000100; // Enable interrupts on PD port
@@ -86,7 +86,7 @@ void ultrasound1() {
 
 
 void ultrasound2() {
-    long pulseDuration; 
+    long pulseDuration;
     //variable needed by the ultrasound sensor code
          // Ultrasound distance in cm
 
