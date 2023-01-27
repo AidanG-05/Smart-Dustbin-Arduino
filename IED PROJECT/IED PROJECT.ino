@@ -7,6 +7,7 @@
 #define LED_RED 6;
 #define Hit_aPin 4;
 #define Hit_bPin 2;
+#define motionPin 9
 
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -23,7 +24,7 @@ void setup() {
     pinMode(EchoPin1, INPUT);  //Arduino's input, ranger's output
     pinMode(EchoPin2, INPUT);
     pinMode(TrigPin2, OUTPUT);
-    
+    pinMode(motionPin, OUTPUT); //digital output for motor direction control
     pinMode(6, OUTPUT);
 
     PCICR |= B00000100; // Enable interrupts on PD port
@@ -39,6 +40,7 @@ void loop()
 {
     ultrasound2();
     ultrasound1();
+    motor();
 }
 
 void ultrasound1() {
@@ -86,7 +88,7 @@ void ultrasound1() {
 
 
 void ultrasound2() {
-    long pulseDuration; 
+    long pulseDuration;
     //variable needed by the ultrasound sensor code
          // Ultrasound distance in cm
 
@@ -119,4 +121,21 @@ ISR(PCINT2_vect) {
     else if (digitalRead(startStop) == LOW) {
 
     }
+}
+void motor()
+{
+    if (Distance2 < 40)
+    {
+        digitalWrite(motionPin, LOW);
+        delay(3000);
+
+    }
+    else
+    {
+        digitalWrite(motionPin, HIGH);
+        delay(2000);
+
+    }
+
+
 }
