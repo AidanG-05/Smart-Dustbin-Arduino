@@ -166,8 +166,7 @@ void ultrasound2() {
 }
 
 
-void motor()
-{
+void motor() {
     if (Distance2 < 40)
     {
         digitalWrite(motionPin, LOW);
@@ -183,8 +182,7 @@ void motor()
 
 
 
-void wifi()
-{
+void wifi() {
     sendVal = random(100); // Send a random number between 1 and 1000
     String sendData = "GET /update?api_key=" + myAPI + "&" + myFIELD + "=" + String(sendVal);
     espData("AT+CIPMUX=1", 1000, DEBUG);       //Allow multiple connections
