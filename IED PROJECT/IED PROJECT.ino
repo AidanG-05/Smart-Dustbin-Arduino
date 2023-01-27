@@ -113,15 +113,6 @@ void ultrasound2() {
     delay(500);
 }
 
-ISR(PCINT2_vect) {
-    if (digitalRead(reset) == LOW)
-    {
-        Serial.print("Free to fill");
-    }
-    else if (digitalRead(startStop) == LOW) {
-
-    }
-}
 void motor()
 {
     if (Distance2 < 40)
