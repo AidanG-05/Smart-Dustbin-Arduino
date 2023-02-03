@@ -13,15 +13,20 @@ int sendVal;
 #define EchoPin1 10   // U/S1 Echo connected to pin 10
 #define TrigPin2 8
 #define EchoPin2 7
-#define LED_RED  6
-#define Hit_aPin 4
-#define Hit_bPin 2
+
+#define LED_RED 6;
+#define Hit_aPin 4;
+#define Hit_bPin 2;
+#define motionPin 9
+
+
+
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 int Distance2;
 int Distance1;
 int reset = 0;
 int startStop = 0;
-int i = 0;
+
 
 void setup()
 {
@@ -41,7 +46,8 @@ void setup()
     pinMode(EchoPin2, INPUT);
     pinMode(TrigPin2, OUTPUT);
 
-    pinMode(6, OUTPUT);
+    pinMode(motionPin, OUTPUT); //digital output for motor direction control
+
 
     //targetboard
     PCICR |= B00000100; // Enable interrupts on PD port
@@ -62,8 +68,11 @@ void loop()
   
     ultrasound2();
     ultrasound1();
+
+    motor();
+    
     wifi();
-    fullbin();
+    
 }
 //wifi related
 String espData(String command, const int timeout, boolean debug)
@@ -88,6 +97,7 @@ String espData(String command, const int timeout, boolean debug)
         Serial.print(response);
     }
     return response;
+
 }
 //inside ultrasound
 void ultrasound1() {
@@ -117,6 +127,7 @@ void ultrasound1() {
     if (Distance1 < 40) {
         lcd.setCursor(0, 0);
         lcd.print("Bin is full");
+        sendVal=1;
         lcd.setCursor(0, 1);
         digitalWrite(6, HIGH);
         delay(2000);
@@ -126,6 +137,7 @@ void ultrasound1() {
     else {
         lcd.setCursor(0, 0);
         lcd.print("Free to fill");
+        sendVal=0;
         lcd.setCursor(0, 1);
         digitalWrite(6, LOW);
         delay(2000);
@@ -158,9 +170,28 @@ void ultrasound2() {
     Serial.println(" cm");
     delay(500);
 }
+
+
+void motor()
+{
+    if (Distance2 < 40)
+    {
+        digitalWrite(motionPin, LOW);
+        delay(3000);
+
+    }
+    else
+    {
+        digitalWrite(motionPin, HIGH);
+        delay(2000);
+
+    }
+
+}
+
 void wifi()
 {
-    sendVal = i; // Send a random number between 1 and 1000
+   
     String sendData = "GET /update?api_key=" + myAPI + "&" + myFIELD + "=" + String(sendVal);
     espData("AT+CIPMUX=1", 1000, DEBUG);       //Allow multiple connections
     espData("AT+CIPSTART=0,\"TCP\",\"" + myHOST + "\"," + myPORT, 1000, DEBUG);
@@ -172,16 +203,4 @@ void wifi()
     
     espData("AT+CIPCLOSE=0", 1000, DEBUG);
     delay(15000);
-}
-
-void fullbin()
-{
-   
-    if (Distance1 < 40)
-    {
-        i++;
-        Serial.println(i);
-            delay(1000);
-    }
-
 }
