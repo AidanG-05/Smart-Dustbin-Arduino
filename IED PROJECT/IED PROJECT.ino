@@ -23,8 +23,10 @@ int sendVal;
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 int Distance2;
+int Distance1;
 int reset = 0;
 int startStop = 0;
+
 
 void setup()
 {
@@ -70,6 +72,7 @@ void loop()
     motor();
     
     wifi();
+    
 }
 //wifi related
 String espData(String command, const int timeout, boolean debug)
@@ -96,10 +99,10 @@ String espData(String command, const int timeout, boolean debug)
     return response;
 
 }
-
+//inside ultrasound
 void ultrasound1() {
     long pulseDuration; //variable needed by the ultrasound sensor code
-    int Distance;       // Ultrasound distance in cm
+    int Distance1;       // Ultrasound distance in cm
 
     // this main code runs repeatedly:
     // 1. Produce a 15us (micro-second) HIGH pulse in Trig to trigger the sensor...
@@ -113,17 +116,18 @@ void ultrasound1() {
     // every 58 us is an obstacle distance of 1 cm
 
     pulseDuration = pulseIn(EchoPin1, HIGH);
-    Distance = pulseDuration / 58;  //  Convert to cm
+    Distance1 = pulseDuration / 58;  //  Convert to cm
 
     // 3. display the obstacle distance in serial monitor 
     Serial.print("Distance INSIDE = ");
-    Serial.print(Distance);
+    Serial.print(Distance1);
     Serial.println(" cm");
     delay(500);
 
-    if (Distance < 40) {
+    if (Distance1 < 40) {
         lcd.setCursor(0, 0);
         lcd.print("Bin is full");
+        sendVal=1;
         lcd.setCursor(0, 1);
         digitalWrite(6, HIGH);
         delay(2000);
@@ -133,12 +137,14 @@ void ultrasound1() {
     else {
         lcd.setCursor(0, 0);
         lcd.print("Free to fill");
+        sendVal=0;
         lcd.setCursor(0, 1);
         digitalWrite(6, LOW);
         delay(2000);
         delay(1000);
     }
 }
+//outside ultrasound
 void ultrasound2() {
     long pulseDuration;
     //variable needed by the ultrasound sensor code
@@ -185,7 +191,7 @@ void motor()
 
 void wifi()
 {
-    sendVal = random(100); // Send a random number between 1 and 1000
+   
     String sendData = "GET /update?api_key=" + myAPI + "&" + myFIELD + "=" + String(sendVal);
     espData("AT+CIPMUX=1", 1000, DEBUG);       //Allow multiple connections
     espData("AT+CIPSTART=0,\"TCP\",\"" + myHOST + "\"," + myPORT, 1000, DEBUG);
@@ -194,8 +200,7 @@ void wifi()
     espSerial.println(sendData);
     Serial.print("Value to be sent: ");
     Serial.println(sendVal);
-
+    
     espData("AT+CIPCLOSE=0", 1000, DEBUG);
     delay(15000);
-
 }
